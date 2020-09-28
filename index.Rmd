@@ -1,0 +1,176 @@
+---
+title: "Creating interactive and animated plots in R"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    df_print: paged
+    code_download: true
+---
+
+## Setup
+
+Welcome to another tutorial for this class, COMP/STAT 112: *Introduction to Data Science*! It will be similar to the others, including demo videos and files embedded in this document and practice problems with hints or solutions at the end. There are some new libraries, so be sure to install those first.
+
+As most of our files do, we start this one with three R code chunks: 1. options, 2. libraries and settings, 3. data. 
+
+```{r setup}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE)
+```
+
+```{r libraries}
+library(tidyverse)     # for data cleaning and plotting
+library(googlesheets4) # for reading googlesheet data
+library(lubridate)     # for date manipulation
+library(openintro)     # for the abbr2state() function
+library(palmerpenguins)# for Palmer penguin data
+library(maps)          # for map data
+library(ggmap)         # for mapping points on maps
+library(gplots)        # for col2hex() function
+library(RColorBrewer)  # for color palettes
+library(sf)            # for working with spatial data
+library(leaflet)       # for highly customizable mapping
+library(ggthemes)      # for more themes (including theme_map())
+library(plotly)        # for the ggplotly() - basic interactivity
+library(gganimate)     # for adding animation layers to ggplots
+library(shiny)         # for creating interactive apps
+gs4_deauth()           # To not have to authorize each time you knit.
+theme_set(theme_minimal())
+```
+
+```{r my_libraries, include=FALSE}
+# Lisa needs this, students don't
+library(downloadthis) # for including download buttons for files
+library(flair) # for highlighting code
+```
+
+```{r data}
+# Lisa's garden data
+garden_harvest <- read_sheet("https://docs.google.com/spreadsheets/d/1DekSazCzKqPS2jnGhKue7tLxRU3GVL1oxi-4bEM5IWw/edit?usp=sharing") %>% 
+  mutate(date = ymd(date))
+```
+
+## Learning Goals
+
+After this tutorial, you should be able to do the following:
+
+* Add basic interactivity to a `ggplot2` plot using `ggplotly()`.  
+
+* Add animation layers to plots using `gganimate` functions.  
+
+* Create a shiny app that requires inputs.  
+
+* Publish a shiny app to shinyapps.io.
+
+##  Motivation
+
+## Easy interactivity with `plotly`
+
+Probably the easiest way to add interactivity to a plot created with `ggplot2` is by using the `ggplotly()` function from the `plotly` library. The `plotly` package can do A LOT more than what we'll cover in this course as it is a plotting framework if its own. But, it can do a lot with just that one function. 
+
+Let's look at an example. In the code below, I compute the cumulative harvest in pounds by vegetable and create a bar graph.  I save the graph and print it out. The code and graph should be familiar.
+
+```{r}
+veggie_harvest_graph <- garden_harvest %>% 
+  group_by(vegetable) %>% 
+  summarize(total_wt_lbs = sum(weight)*0.00220462) %>% 
+  ggplot() +
+  geom_col(aes(x = total_wt_lbs, 
+               y = fct_reorder(vegetable, 
+                               total_wt_lbs, 
+                               .desc = FALSE))) +
+  labs(title = "Total Harvest by vegetable (lb)", 
+       x = "",
+       y = "")
+
+veggie_harvest_graph
+```
+
+Now, we `ploty`-ify it!
+
+```{r}
+ggplotly(veggie_harvest_graph)
+```
+
+The labeling is fairly ugly in the graph above. I can fix some of that by editing my original plot. In the code below, I add a `text` aesthetic, which will be used in `ggplotly()` to display the vegetable name, and use `tooltip` to tell it the aesthetics to display when scrolling over the graph.
+
+```{r ggplotly-ex, echo=FALSE, eval=FALSE}
+veggie_harvest_graph2 <- garden_harvest %>% 
+  group_by(vegetable) %>% 
+  summarize(total_wt_lbs = sum(weight)*0.00220462) %>% 
+  ggplot() +
+  geom_col(aes(x = total_wt_lbs, 
+               y = fct_reorder(vegetable, 
+                               total_wt_lbs, 
+                               .desc = FALSE),
+               text = vegetable)) +
+  labs(title = "Total Harvest by vegetable (lb)", 
+       x = "",
+       y = "")
+
+ggplotly(veggie_harvest_graph2,
+         tooltip = c("text", "x"))
+```
+
+
+```{r, echo=FALSE}
+decorate_chunk("ggplotly-ex") %>% 
+  flair("text = vegetable") %>% 
+  flair("tooltip =")
+```
+
+
+This works for many different types of plots created with `ggplot2`. 
+
+### Resources
+
+[Ploty's ggplot2 integration](https://plotly.com/ggplot2/)
+
+### Your turn!
+
+#### Exercise
+
+In this exercise, choose 2 graphs you have created for ANY assignment in this class and add interactivity using the `ggplotly()` function. 
+
+## Adding animation with `gganimate`
+
+## Key elements
+
+The `gganimate` package works well with `ggplot2` functions by providing additional grammar that assists in adding animation to the plots. From Thomas Pedersen's documentation, here are the key functions/grammar of the package:
+
+* `transition_*()` defines how the data should be spread out and how it relates to itself across time (time is not always actual time).
+* `view_*()` defines how the positional scales should change along the animation.
+* `shadow_*()` defines how data from other points in time should be presented in the given point in time.
+* `enter_*()/exit_*()` defines how new data should appear and how old data should disappear during the course of the animation.
+* `ease_aes()` defines how different aesthetics should be eased during transitions.
+
+You only need a `transition_*()` or `view_*()` function to add animation. This tutorial focuses on three `transition_*()` functions: `transition_states()`, `transition_time()`, and `transition_reveal()`. The following image, taken from the gganimate cheatsheet, gives a nice overview of the three functions. 
+
+![Image from: https://ugoproto.github.io/ugo_r_doc/pdf/gganimate.pdf](../../images/gganimate_transitions.png)
+
+
+### Demo video
+
+### Resources
+
+* [gganimate intro slides](https://goodekat.github.io/presentations/2019-isugg-gganimate-spooky/slides.html) by Katherine Goode (she animates bats flying!)
+
+* [gganimate cheatsheet](https://ugoproto.github.io/ugo_r_doc/pdf/gganimate.pdf)
+
+* [gganimate by Thomas Pedersen](https://github.com/thomasp85/gganimate) - scroll down to the bottom  
+* [Pedersen introductory vignette](https://cran.r-project.org/web/packages/gganimate/vignettes/gganimate.html) - gives a brief intro to what each of the key functions do  
+* [gganimate wiki page](https://github.com/thomasp85/gganimate/wiki) - most of this is currently under development but there's some good examples  
+
+* [ropensci examples](https://github.com/ropenscilabs/learngganimate)
+
+### Your turn!
+
+## Creating an app with `shiny`
+
+### Demo video
+
+### Resources
+
+### Your turn!

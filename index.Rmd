@@ -136,9 +136,11 @@ In this exercise, choose 2 graphs you have created for ANY assignment in this cl
 
 ## Adding animation with `gganimate`
 
-## Key elements
+### Key functions
 
-The `gganimate` package works well with `ggplot2` functions by providing additional grammar that assists in adding animation to the plots. From Thomas Pedersen's documentation, here are the key functions/grammar of the package:
+The `gganimate` package works well with `ggplot2` functions by providing additional grammar that assists in adding animation to the plots. These functions get added as layers in `ggplot()`, just like you are used to adding `geom_*()` layers and other layers that modify the graph.
+
+From Thomas Pedersen's documentation, here are the key functions/grammar of the package:
 
 * `transition_*()` defines how the data should be spread out and how it relates to itself across time (time is not always actual time).
 * `view_*()` defines how the positional scales should change along the animation.
@@ -146,7 +148,11 @@ The `gganimate` package works well with `ggplot2` functions by providing additio
 * `enter_*()/exit_*()` defines how new data should appear and how old data should disappear during the course of the animation.
 * `ease_aes()` defines how different aesthetics should be eased during transitions.
 
-You only need a `transition_*()` or `view_*()` function to add animation. This tutorial focuses on three `transition_*()` functions: `transition_states()`, `transition_time()`, and `transition_reveal()`. The following image, taken from the gganimate cheatsheet, gives a nice overview of the three functions. 
+You only need a `transition_*()` or `view_*()` function to add animation. This tutorial focuses on three `transition_*()` functions: `transition_states()`, `transition_time()`, and `transition_reveal()`. 
+
+### `transition_*()` functions
+
+The following image, taken from the gganimate cheatsheet, gives a nice overview of the three functions. 
 
 ![Image from: https://ugoproto.github.io/ugo_r_doc/pdf/gganimate.pdf](../../images/gganimate_transitions.png)
 

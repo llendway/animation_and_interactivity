@@ -35,6 +35,7 @@ library(leaflet)       # for highly customizable mapping
 library(ggthemes)      # for more themes (including theme_map())
 library(plotly)        # for the ggplotly() - basic interactivity
 library(gganimate)     # for adding animation layers to ggplots
+library(transformr)    # for "tweening" (gganimate)
 library(shiny)         # for creating interactive apps
 gs4_deauth()           # To not have to authorize each time you knit.
 theme_set(theme_minimal())
@@ -50,6 +51,8 @@ library(flair) # for highlighting code
 # Lisa's garden data
 garden_harvest <- read_sheet("https://docs.google.com/spreadsheets/d/1DekSazCzKqPS2jnGhKue7tLxRU3GVL1oxi-4bEM5IWw/edit?usp=sharing") %>% 
   mutate(date = ymd(date))
+
+data("penguins")
 ```
 
 ## Learning Goals
@@ -150,12 +153,243 @@ From Thomas Pedersen's documentation, here are the key functions/grammar of the 
 
 You only need a `transition_*()` or `view_*()` function to add animation. This tutorial focuses on three `transition_*()` functions: `transition_states()`, `transition_time()`, and `transition_reveal()`. 
 
+### Creating an animated plot with `gganimate`
+
+1. Create your base `ggplot()`  
+2. Add appropriate `geom_*()` layers.  
+3. Add any other stylistic additions (themes, titles, etc.)  
+4. Add `gganimate` `transition_*()` layer  
+5. Add `gganimate` options, which may include making some changes in the `ggplot()` code.
+
 ### `transition_*()` functions
 
 The following image, taken from the gganimate cheatsheet, gives a nice overview of the three functions. 
 
 ![Image from: https://ugoproto.github.io/ugo_r_doc/pdf/gganimate.pdf](../../images/gganimate_transitions.png)
 
+#### `transition_states()`
+
+This transition is used to transition between distinct stages of the data. We will show an example of transitioning between levels of a categorical variable. We will use the `garden_harvest` dataset and will follow the steps outlined above for creating an animated plot.
+
+First, we create a dataset of daily tomato harvests in pounds for each variety of tomato. We add day of week and reorder variety from most to least harvested.
+
+```{r}
+daily_tomato <- garden_harvest %>% 
+  filter(vegetable == "tomatoes") %>% 
+  group_by(variety, date) %>% 
+  summarize(daily_harvest = sum(weight)*0.00220462) %>% 
+  mutate(day_of_week = wday(date, label = TRUE)) %>% 
+  ungroup() %>% 
+  mutate(variety = fct_reorder(variety, daily_harvest, sum, .desc = TRUE)) 
+
+daily_tomato
+``` 
+
+Next, we create a jittered scatterplot of daily harvest by day of week. We facet the plot by variety.
+
+```{r}
+daily_tomato %>% 
+  ggplot(aes(x = daily_harvest, 
+             y = day_of_week)) +
+  geom_jitter() +
+  facet_wrap(vars(variety)) +
+  labs(title = "Daily tomato harvest",
+       x = "",
+       y = "") 
+```
+
+Now, instead of looking at the data by faceting, we will use animation and transition by variety. This code takes a while to run. And the animation shows up over in the Viewer in the lower right-hand pane, rather than in the preview below the code chunk.
+
+```{r tomato-gganimate, eval=FALSE, echo=FALSE}
+daily_tomato %>% 
+  ggplot(aes(x = daily_harvest, 
+             y = day_of_week)) +
+  geom_jitter() +
+  labs(title = "Daily tomato harvest",
+       x = "",
+       y = "") +
+  transition_states(variety)
+```
+
+
+```{r, echo=FALSE}
+decorate_chunk("tomato-gganimate", eval=FALSE) %>% 
+  flair("transition_states(variety)")
+```
+
+```{r, eval=FALSE, echo=FALSE}
+anim_save("tomatoes1.gif")
+```
+
+```{r, echo=FALSE}
+knitr::include_graphics("tomatoes1.gif")
+```
+
+Because it takes a while to create the animation, you don't want to recreate it each time you knit your file. So, in the code chunk where you create the animation, add `eval=FALSE` to the code chunk options (ie. inside the curly brackets next to the lowercase r). 
+
+Then, save the gif using the `anim_save()` function, like in the code below. The name in quotes is the name of the file that will be created, which needs to end in .gif. This will automatically save your *most recent* `gganimate` plot. So, be sure to run the code right after you create the animation. Alternatively, you can save your `gganimate`, say you called it `plot1` and do `anim_save(plot_1, "tomatoes1.gif")`. This will be saved to your *working directory*. If you are working in a project (hopefully the one linked to your GitHub repo, right?), then this will go to the main folder for the project if that is where the .Rmd file is located. 
+
+```{r, eval=FALSE}
+anim_save("tomatoes1.gif")
+```
+
+Then, load the file back in using the following code. You can add `echo=FALSE` to the code chunk options to omit displaying the code. 
+
+```{r, eval=FALSE}
+knitr::include_graphics("tomatoes1.gif")
+```
+
+Now, let's return to the animation that was created. There are a couple things we should fix. One is that as it animates, it looks like the observations from one `variety` morph into the observations from the next `variety.` We can fix this in two ways. One, is to color by `variety`: 
+
+```{r tomato-gganimate2, eval=FALSE, echo=FALSE}
+daily_tomato %>% 
+  ggplot(aes(x = daily_harvest, 
+             y = day_of_week,
+             color = variety)) +
+  geom_jitter() +
+  scale_color_viridis_d(option = "magma") +
+  labs(title = "Daily tomato harvest",
+       x = "",
+       y = "",
+       color = "") +
+  theme(legend.position = "none") +
+  transition_states(variety)
+```
+
+```{r, echo=FALSE}
+decorate_chunk("tomato-gganimate2", eval=FALSE) %>% 
+  flair("color = variety") %>% 
+  flair('scale_color_viridis_d(option = "magma")') %>% 
+  flair("color =") %>% 
+  flair('theme(legend.position = "none")')
+```
+
+```{r, eval=FALSE}
+anim_save("tomatoes2.gif")
+```
+
+```{r}
+knitr::include_graphics("tomatoes2.gif")
+```
+
+Another, is to map `variety` to the `group` aesthetic (This is the recommended way to do it, even if we also color by `variety`.): 
+
+```{r tomato-gganimate3, eval=FALSE, echo=FALSE}
+daily_tomato %>% 
+  ggplot(aes(x = daily_harvest, 
+             y = day_of_week,
+             group = variety)) +
+  geom_jitter() +
+  labs(title = "Daily tomato harvest",
+       x = "",
+       y = "") +
+  transition_states(variety)
+```
+
+```{r, echo=FALSE}
+decorate_chunk("tomato-gganimate3", eval=FALSE) %>% 
+  flair("group = variety")
+```
+
+```{r, eval=FALSE}
+anim_save("tomatoes3.gif")
+```
+
+```{r}
+knitr::include_graphics("tomatoes3.gif")
+```
+
+Another issue is that we don't see the `variety` names as it animates through. Thankfully, the various `transition_*()` functions create some useful variables we can use to display the names of `variety`. The variables created are shown below. 
+
+![From `transition_states()` help](../../images/gganimate_transition_state_vars.png)
+
+We can access the variables by putting them in square brackets inside a label. Below, I use the `closest_state` variable that is created to add the `variety` to the subtitle of the plot.
+
+```{r tomato-gganimate4, eval=FALSE, echo=FALSE}
+daily_tomato %>% 
+  ggplot(aes(x = daily_harvest, 
+             y = day_of_week,
+             group = variety)) +
+  geom_jitter() +
+  labs(title = "Daily tomato harvest",
+       subtitle = "Variety: {closest_state}",
+       x = "",
+       y = "") +
+  transition_states(variety)
+```
+
+```{r, echo=FALSE}
+decorate_chunk("tomato-gganimate4", eval=FALSE) %>% 
+  flair('subtitle = "Variety: {closest_state}"')
+```
+
+```{r, eval=FALSE}
+anim_save("tomatoes4.gif")
+```
+
+```{r}
+knitr::include_graphics("tomatoes4.gif")
+```
+
+There are many options we can change. Below, we make a couple more changes.
+
+*
+
+*
+
+```{r tomato-gganimate5, eval=FALSE, echo=FALSE}
+daily_tomato %>% 
+  ggplot(aes(x = daily_harvest, 
+             y = day_of_week,
+             group = variety)) +
+  geom_jitter() +
+  labs(title = "Daily tomato harvest",
+       subtitle = "Variety: {closest_state}",
+       x = "",
+       y = "") +
+  transition_states(variety, 
+                    transition_length = 3, 
+                    state_length = 4) +
+  exit_shrink() +
+  enter_recolor(color = "lightblue")
+```
+
+
+
+
+```{r}
+cum_harvest_subset <- garden_harvest %>% 
+  filter(vegetable %in% c("tomatoes", "beans", 
+                          "peas", "zucchini")) %>% 
+  group_by(vegetable, date) %>% 
+  summarize(daily_harvest_lb = sum(weight)*0.00220462) %>% 
+  mutate(cum_harvest_lb = cumsum(daily_harvest_lb))
+```
+
+```{r}
+cum_harvest_subset %>% 
+  ggplot(aes(x = date, 
+             y = cum_harvest_lb,
+             color = vegetable)) +
+  geom_line() +
+  labs(title = "Cumulative harvest (lb)", 
+       x = "",
+       y = "") 
+```
+
+```{r, eval=FALSE}
+cum_harvest_subset %>% 
+  ggplot(aes(x = date, 
+             y = cum_harvest_lb,
+             color = vegetable)) +
+  geom_line() +
+  geom_text(aes(label = vegetable)) +
+  labs(title = "Cumulative harvest (lb)", 
+       x = "",
+       y = "", 
+       color = "") +
+  transition_reveal(date)
+```
 
 ### Demo video
 

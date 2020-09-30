@@ -669,7 +669,15 @@ knitr::include_graphics("vegcum3.gif")
 
 ### Your turn!
 
+Use animation to tell an interesting story with the `small_trains` dataset that contains data from the SNCF (National Society of French Railways). These are Tidy Tuesday data! Read more about it [here](https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-02-26).
+
+```{r}
+small_trains <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-02-26/small_trains.csv") 
+```
+
 ## Creating an app with `shiny`
+
+COMING SOON!
 
 ### Demo video
 

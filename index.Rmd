@@ -651,7 +651,33 @@ knitr::include_graphics("vegcum3.gif")
 
 ### Demo video
 
-**COMING SOON!**
+Now watch the demo video!
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Yyfi96xiBMo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+[Voicethread: `gganimate` demo](https://voicethread.com/myvoice/create/15619897)
+
+```{r, echo=FALSE}
+download_file(
+  path = "gganimate_demo_no_code.Rmd",
+  button_label = "Download gganimate demo file (without code)",
+  button_type = "warning",
+  has_icon = TRUE,
+  icon = "fa fa-save",
+  self_contained = FALSE
+)
+```
+
+```{r, echo=FALSE}
+download_file(
+  path = "gganimate_demo.Rmd",
+  button_label = "Download gganimate demo file (with code)",
+  button_type = "info",
+  has_icon = TRUE,
+  icon = "fa fa-save",
+  self_contained = FALSE
+)
+```
 
 ### Resources
 

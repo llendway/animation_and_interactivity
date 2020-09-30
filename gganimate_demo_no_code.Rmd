@@ -1,0 +1,365 @@
+---
+title: "`gganimate` demo"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    df_print: paged
+    code_download: true
+---
+
+```{r setup}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      warning = FALSE)
+```
+
+```{r libraries}
+library(tidyverse)     # for data cleaning and plotting
+library(googlesheets4) # for reading googlesheet data
+library(lubridate)     # for date manipulation
+library(openintro)     # for the abbr2state() function
+library(palmerpenguins)# for Palmer penguin data
+library(maps)          # for map data
+library(ggmap)         # for mapping points on maps
+library(gplots)        # for col2hex() function
+library(RColorBrewer)  # for color palettes
+library(sf)            # for working with spatial data
+library(leaflet)       # for highly customizable mapping
+library(ggthemes)      # for more themes (including theme_map())
+library(plotly)        # for the ggplotly() - basic interactivity
+library(gganimate)     # for adding animation layers to ggplots
+library(transformr)    # for "tweening" (gganimate)
+library(shiny)         # for creating interactive apps
+gs4_deauth()           # To not have to authorize each time you knit.
+theme_set(theme_minimal())
+```
+
+```{r data}
+# Lisa's garden data
+garden_harvest <- read_sheet("https://docs.google.com/spreadsheets/d/1DekSazCzKqPS2jnGhKue7tLxRU3GVL1oxi-4bEM5IWw/edit?usp=sharing") %>% 
+  mutate(date = ymd(date))
+```
+
+In this demo, we are going to go through creating the animations from the tutorial, plus a bonus animation at the end!
+
+## Creating an animated plot with `gganimate`
+
+1. Create your base `ggplot()`  
+2. Add appropriate `geom_*()` layers.  
+3. Add any other stylistic additions (themes, titles, etc.)  
+4. Add `gganimate` `transition_*()` layer  
+5. Add `gganimate` options, which may include making some changes in the `ggplot()` code.
+
+## `transition_states()`
+
+Prep data
+
+```{r}
+daily_tomato <- garden_harvest %>% 
+  filter(vegetable == "tomatoes") %>% 
+  group_by(variety, date) %>% 
+  summarize(daily_harvest = sum(weight)*0.00220462) %>% 
+  mutate(day_of_week = wday(date, label = TRUE)) %>% 
+  ungroup() %>% 
+  mutate(variety = fct_reorder(variety, daily_harvest, sum, .desc = TRUE)) 
+
+daily_tomato
+``` 
+
+Create the static plot
+
+```{r}
+daily_tomato %>% 
+  ggplot(aes(x = daily_harvest, 
+             y = day_of_week)) +
+  geom_jitter() +
+  facet_wrap(vars(variety)) +
+  labs(title = "Daily tomato harvest",
+       x = "",
+       y = "") 
+```
+
+
+Replace faceting with animation
+
+```{r}
+daily_tomato %>% 
+  ggplot(aes(x = daily_harvest, 
+             y = day_of_week)) +
+  geom_jitter() +
+  labs(title = "Daily tomato harvest",
+       x = "",
+       y = "") +
+  transition_???(___)
+```
+
+Add `echo=FALSE` to previous chunk.
+
+Save the animation:
+
+```{r, eval=FALSE, echo=FALSE}
+anim_save("tomatoes1.gif")
+```
+
+Reload the animation:
+
+```{r, echo=FALSE}
+knitr::include_graphics("tomatoes1.gif")
+```
+
+Make some changes:
+
+```{r}
+_______ <- daily_tomato %>% 
+  ggplot(aes(x = daily_harvest, 
+             y = day_of_week,
+             group = ______)) +
+  geom_jitter() +
+  labs(title = "Daily tomato harvest",
+       subtitle = "Variety: {______}",
+       x = "",
+       y = "") +
+  transition_states(variety, 
+                    transition_length = ___, 
+                    state_length = ___) +
+  exit_shrink() +
+  enter_recolor(color = "lightblue") +
+  exit_recolor(color = "lightblue")
+
+animate(_____, duration = ___)
+```
+
+Save it:
+
+```{r}
+
+```
+
+Read it back in:
+
+```{r}
+
+```
+
+## `transition_time()`
+
+Prep data:
+
+```{r}
+daily_harvest_subset <- garden_harvest %>% 
+  filter(vegetable %in% c("tomatoes", "beans", 
+                          "peas", "zucchini")) %>% 
+  group_by(vegetable, date) %>% 
+  summarize(daily_harvest_lb = sum(weight)*0.00220462) 
+
+daily_harvest_subset
+```
+
+Static plot:
+
+```{r}
+daily_harvest_subset %>% 
+  ggplot(aes(x = date, 
+             y = daily_harvest_lb,
+             color = vegetable,
+             shape = vegetable)) +
+  geom_point() +
+  labs(title = "Daily harvest (lb)", 
+       x = "",
+       y = "",
+       color = "vegetable",
+       shape = "vegetable") +
+  scale_color_manual(values = c("tomatoes" = "darkred",
+                       "beans" = "springgreen4",
+                       "peas" = "yellowgreen",
+                       "zucchini" = "darkgreen")) +
+  theme(legend.position = "top",
+        legend.title = element_blank()) 
+```
+
+Animate with additional features:
+
+```{r veg2, eval=FALSE, echo=FALSE}
+daily_harvest_subset %>% 
+  ggplot(aes(x = date, 
+             y = daily_harvest_lb,
+             color = vegetable,
+             shape = vegetable)) +
+  geom_point() +
+  labs(title = "Daily harvest (lb)", 
+       subtitle = "Date: {____}",
+       x = "",
+       y = "",
+       color = "vegetable",
+       shape = "vegetable") +
+  scale_color_manual(values = c("tomatoes" = "darkred",
+                                "beans" = "springgreen4",
+                                "peas" = "yellowgreen",
+                                "zucchini" = "darkgreen")) +
+  theme(legend.position = "top",
+        legend.title = element_blank()) +
+  transition_???(___) +
+  shadow_wake(wake_length = .3) +
+  exit_fade()
+```
+
+Save it:
+
+```{r}
+
+```
+
+Read it back in:
+
+```{r}
+
+```
+
+## `transition_reveal()`
+
+Prep the data:
+
+```{r}
+cum_harvest_subset <- garden_harvest %>% 
+  filter(vegetable %in% c("tomatoes", "beans", 
+                          "peas", "zucchini")) %>% 
+  group_by(vegetable, date) %>% 
+  summarize(daily_harvest_lb = sum(weight)*0.00220462) %>% 
+  mutate(cum_harvest_lb = cumsum(daily_harvest_lb))
+
+cum_harvest_subset
+```
+
+Create static plot:
+
+```{r}
+cum_harvest_subset %>% 
+  ggplot(aes(x = date, 
+             y = cum_harvest_lb,
+             color = vegetable)) +
+  geom_line() +
+  labs(title = "Cumulative harvest (lb)", 
+       x = "",
+       y = "",
+       color = "vegetable") +
+  scale_color_manual(values = c("tomatoes" = "darkred",
+                       "beans" = "springgreen4",
+                       "peas" = "yellowgreen",
+                       "zucchini" = "darkgreen")) +
+  theme(legend.position = "top",
+        legend.title = element_blank())
+```
+
+Animate the plot with some extras:
+
+```{r veg-cum2, eval=FALSE, echo=FALSE}
+cum_harvest_subset %>% 
+  ggplot(aes(x = date, 
+             y = cum_harvest_lb,
+             color = vegetable)) +
+  geom_line() +
+  geom_text(aes(label = ____)) +
+  labs(title = "Cumulative harvest (lb)", 
+       subtitle = "Date: {___}",
+       x = "",
+       y = "",
+       color = "vegetable") +
+  scale_color_manual(values = c("tomatoes" = "darkred",
+                       "beans" = "springgreen4",
+                       "peas" = "yellowgreen",
+                       "zucchini" = "darkgreen")) +
+  theme(legend.position = "none") +
+  transition_reveal(date)
+```
+
+Save it:
+
+```{r}
+
+```
+
+Read it back in:
+
+```{r}
+
+```
+
+## Racing veggies!
+
+```{r}
+cum_harvest_all_dates <- garden_harvest %>% 
+  group_by(date, vegetable) %>% 
+  summarize(daily_harvest_lb = sum(weight)*0.00220462) %>% 
+  ungroup() %>% 
+  complete(date, vegetable) %>% 
+  arrange(vegetable,date) %>% 
+  group_by(vegetable) %>% 
+  replace_na(list(daily_harvest_lb = 0)) %>% 
+  mutate(cum_harvest_lb = cumsum(daily_harvest_lb)) %>% 
+  filter(cum_harvest_lb > 0)
+```
+
+```{r}
+cum_harvest_all_dates %>% 
+  group_by(date) %>% 
+  filter(n()>=10) %>% 
+  top_n(n = 10, wt = cum_harvest_lb) %>% 
+  arrange(date, cum_harvest_lb) %>% 
+  mutate(rank = 1:n()) %>% 
+  filter(date %in% seq(ymd("2020-06-21"), ymd("2020-09-20"), by = "weeks")) %>% 
+  ggplot(aes(x = cum_harvest_lb,
+             y = factor(rank),
+             fill = vegetable)) +
+  geom_col() +
+  geom_text(aes(label = vegetable),
+            x = -10,
+            hjust = "right") +
+  facet_wrap(vars(date), scales = "free_y") +
+  scale_x_continuous(limits = c(-100,NA),
+                     breaks = c(seq(10,100,10),seq(100,400,20))) +
+  labs(title = "Cumulative Harvest (lb)",
+       x = "", 
+       y = "") +
+  theme(axis.line = element_blank(), 
+        panel.grid = element_blank(),
+        axis.text.y = element_blank(),
+        legend.position = "none") +
+  scale_fill_viridis_d()
+```
+
+```{r, eval=FALSE}
+racing_veggies <- cum_harvest_all_dates %>% 
+  group_by(date) %>% 
+  filter(n()>=10) %>% 
+  top_n(n = 10, wt = cum_harvest_lb) %>% 
+  arrange(date, cum_harvest_lb) %>% 
+  mutate(rank = 1:n()) %>% 
+  ggplot(aes(x = cum_harvest_lb,
+             y = factor(rank),
+             fill = vegetable,
+             group = vegetable)) +
+  geom_col() +
+  geom_text(aes(label = vegetable),
+            x = -10,
+            hjust = "right") +
+  scale_x_continuous(limits = c(-80,NA),
+                     breaks = c(seq(0,400,20))) +
+  labs(title = "Cumulative Harvest (lb)",
+       subtitle = "Date: {frame_time}",
+       x = "", 
+       y = "") +
+  theme(axis.line = element_blank(), 
+        panel.grid = element_blank(),
+        axis.text.y = element_blank(),
+        legend.position = "none") +
+  scale_fill_viridis_d() +
+  transition_time(date)
+
+animate(racing_veggies, nframes = 200, duration = 30)
+anim_save("racing_veggies.gif")
+```
+
+```{r, echo=FALSE}
+knitr::include_graphics("racing_veggies.gif")
+```

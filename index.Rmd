@@ -51,8 +51,6 @@ library(flair) # for highlighting code
 # Lisa's garden data
 garden_harvest <- read_sheet("https://docs.google.com/spreadsheets/d/1DekSazCzKqPS2jnGhKue7tLxRU3GVL1oxi-4bEM5IWw/edit?usp=sharing") %>% 
   mutate(date = ymd(date))
-
-data("penguins")
 ```
 
 ## Learning Goals

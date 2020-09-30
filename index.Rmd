@@ -504,7 +504,9 @@ knitr::include_graphics("veg2.gif")
 
 #### `transition_reveal()`
 
-This transition allows you to let data gradually appear. We will show an example of building up the data over harvest dates in the `garden_harvest` dataset.  We will follow the steps outlined earlier for creating an animated plot.
+This transition allows you to let data gradually appear. We will show an example of building up the cumulative harvest data over harvest dates using the `garden_harvest` dataset.  We will follow the steps outlined earlier for creating an animated plot.
+
+First we create a dataset of cumulative harvest by date for a subset of vegetables.
 
 ```{r}
 cum_harvest_subset <- garden_harvest %>% 
@@ -513,7 +515,11 @@ cum_harvest_subset <- garden_harvest %>%
   group_by(vegetable, date) %>% 
   summarize(daily_harvest_lb = sum(weight)*0.00220462) %>% 
   mutate(cum_harvest_lb = cumsum(daily_harvest_lb))
+
+cum_harvest_subset
 ```
+
+Next, we create a static plot of cumulative harvest, coloring the lines by vegetable.
 
 ```{r}
 cum_harvest_subset %>% 
@@ -523,10 +529,58 @@ cum_harvest_subset %>%
   geom_line() +
   labs(title = "Cumulative harvest (lb)", 
        x = "",
-       y = "") 
+       y = "",
+       color = "vegetable") +
+  scale_color_manual(values = c("tomatoes" = "darkred",
+                       "beans" = "springgreen4",
+                       "peas" = "yellowgreen",
+                       "zucchini" = "darkgreen")) +
+  theme(legend.position = "top",
+        legend.title = element_blank())
 ```
 
-```{r, eval=FALSE}
+And now, add animation! 
+
+```{r veg-cum1, eval=FALSE, echo=FALSE}
+cum_harvest_subset %>% 
+  ggplot(aes(x = date, 
+             y = cum_harvest_lb,
+             color = vegetable)) +
+  geom_line() +
+  labs(title = "Cumulative harvest (lb)", 
+       x = "",
+       y = "",
+       color = "vegetable") +
+  scale_color_manual(values = c("tomatoes" = "darkred",
+                       "beans" = "springgreen4",
+                       "peas" = "yellowgreen",
+                       "zucchini" = "darkgreen")) +
+  theme(legend.position = "top",
+        legend.title = element_blank()) +
+  transition_reveal(date)
+```
+
+
+```{r, echo=FALSE}
+decorate_chunk("veg-cum1", eval=FALSE) %>% 
+  flair("transition_reveal(date)")
+```
+
+```{r, eval=FALSE, echo=FALSE}
+anim_save("vegcum1.gif")
+```
+
+```{r, echo=FALSE}
+knitr::include_graphics("vegcum1.gif")
+```
+
+And now let's do a couple things to improve the plot:
+
+* Remove the legend and add text that shows vegetable name on the plot (I love this!). 
+
+* Add date to the subtitle.
+
+```{r veg-cum2, eval=FALSE, echo=FALSE}
 cum_harvest_subset %>% 
   ggplot(aes(x = date, 
              y = cum_harvest_lb,
@@ -534,15 +588,72 @@ cum_harvest_subset %>%
   geom_line() +
   geom_text(aes(label = vegetable)) +
   labs(title = "Cumulative harvest (lb)", 
+       subtitle = "Date: {frame_along}",
        x = "",
-       y = "", 
-       color = "") +
+       y = "",
+       color = "vegetable") +
+  scale_color_manual(values = c("tomatoes" = "darkred",
+                       "beans" = "springgreen4",
+                       "peas" = "yellowgreen",
+                       "zucchini" = "darkgreen")) +
+  theme(legend.position = "none") +
   transition_reveal(date)
 ```
 
 
+```{r, echo=FALSE}
+decorate_chunk("veg-cum2", eval=FALSE) %>% 
+  flair('legend.position = "none"') %>% 
+  flair("geom_text(aes(label = vegetable))") %>% 
+  flair('subtitle = "Date: {frame_along}"')
+```
+
+```{r, eval=FALSE, echo=FALSE}
+anim_save("vegcum2.gif")
+```
+
+```{r, echo=FALSE}
+knitr::include_graphics("vegcum2.gif")
+```
+
+We could have used this same data with a different type of transition. It's always good to think about the point you are trying to make with the animation.
+
+```{r veg-cum3, eval=FALSE, echo=FALSE}
+cum_harvest_subset %>% 
+  ggplot(aes(x = date, 
+             y = cum_harvest_lb,
+             color = vegetable)) +
+  geom_line() +
+  labs(title = "Cumulative harvest (lb)", 
+       subtitle = "Vegetable: {closest_state}",
+       x = "",
+       y = "",
+       color = "vegetable") +
+  scale_color_manual(values = c("tomatoes" = "darkred",
+                       "beans" = "springgreen4",
+                       "peas" = "yellowgreen",
+                       "zucchini" = "darkgreen")) +
+  theme(legend.position = "none") +
+  transition_states(vegetable)
+```
+
+```{r, echo=FALSE}
+decorate_chunk("veg-cum3", eval=FALSE) %>% 
+  flair('subtitle = "Vegetable: {closest_state}"') %>% 
+  flair("transition_states(vegetable)")
+```
+
+```{r, eval=FALSE, echo=FALSE}
+anim_save("vegcum3.gif")
+```
+
+```{r, echo=FALSE}
+knitr::include_graphics("vegcum3.gif")
+```
 
 ### Demo video
+
+**COMING SOON!**
 
 ### Resources
 

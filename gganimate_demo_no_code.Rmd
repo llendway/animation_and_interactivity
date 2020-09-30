@@ -287,6 +287,8 @@ Read it back in:
 
 ## Racing veggies!
 
+Mostly get data prepped (you'll see I didn't do everything I needed to do):
+
 ```{r}
 cum_harvest_all_dates <- garden_harvest %>% 
   group_by(date, vegetable) %>% 
@@ -299,6 +301,8 @@ cum_harvest_all_dates <- garden_harvest %>%
   mutate(cum_harvest_lb = cumsum(daily_harvest_lb)) %>% 
   filter(cum_harvest_lb > 0)
 ```
+
+Do a little more data prep and create static plot:
 
 ```{r}
 cum_harvest_all_dates %>% 
@@ -327,6 +331,8 @@ cum_harvest_all_dates %>%
         legend.position = "none") +
   scale_fill_viridis_d()
 ```
+
+Let the races begin!
 
 ```{r, eval=FALSE}
 racing_veggies <- cum_harvest_all_dates %>% 

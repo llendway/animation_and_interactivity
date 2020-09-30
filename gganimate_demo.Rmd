@@ -83,7 +83,7 @@ daily_tomato %>%
 
 Replace faceting with animation
 
-```{r}
+```{r, eval=FALSE}
 daily_tomato %>% 
   ggplot(aes(x = daily_harvest, 
              y = day_of_week)) +
@@ -91,10 +91,10 @@ daily_tomato %>%
   labs(title = "Daily tomato harvest",
        x = "",
        y = "") +
-  transition_???(___)
+  transition_states(variety)
 ```
 
-Add `echo=FALSE` to previous chunk.
+Add `eval=FALSE` to previous chunk.
 
 Save the animation:
 
@@ -111,35 +111,35 @@ knitr::include_graphics("tomatoes1.gif")
 Make some changes:
 
 ```{r}
-_______ <- daily_tomato %>% 
+tomato_gganim <- daily_tomato %>% 
   ggplot(aes(x = daily_harvest, 
              y = day_of_week,
-             group = ______)) +
+             group = variety)) +
   geom_jitter() +
   labs(title = "Daily tomato harvest",
-       subtitle = "Variety: {______}",
+       subtitle = "Variety: {closest_state}",
        x = "",
        y = "") +
   transition_states(variety, 
-                    transition_length = ___, 
-                    state_length = ___) +
+                    transition_length = 2, 
+                    state_length = 1) +
   exit_shrink() +
   enter_recolor(color = "lightblue") +
   exit_recolor(color = "lightblue")
 
-animate(_____, duration = ___)
+animate(tomato_gganim, duration = 20)
 ```
 
 Save it:
 
 ```{r}
-
+anim_save("test.gif")
 ```
 
 Read it back in:
 
 ```{r}
-
+knitr::include_graphics("test.gif")
 ```
 
 ## `transition_time()`
@@ -188,7 +188,7 @@ daily_harvest_subset %>%
              shape = vegetable)) +
   geom_point() +
   labs(title = "Daily harvest (lb)", 
-       subtitle = "Date: {____}",
+       subtitle = "Date: {frame_time}",
        x = "",
        y = "",
        color = "vegetable",
@@ -199,7 +199,7 @@ daily_harvest_subset %>%
                                 "zucchini" = "darkgreen")) +
   theme(legend.position = "top",
         legend.title = element_blank()) +
-  transition_???(___) +
+  transition_time(date) +
   shadow_wake(wake_length = .3) +
   exit_fade()
 ```
@@ -207,13 +207,13 @@ daily_harvest_subset %>%
 Save it:
 
 ```{r}
-
+anim_save("daily_harvest.gif")
 ```
 
 Read it back in:
 
 ```{r}
-
+knitr::include_graphics("daily_harvest.gif")
 ```
 
 ## `transition_reveal()`
@@ -259,9 +259,9 @@ cum_harvest_subset %>%
              y = cum_harvest_lb,
              color = vegetable)) +
   geom_line() +
-  geom_text(aes(label = ____)) +
+  geom_text(aes(label = vegetable)) +
   labs(title = "Cumulative harvest (lb)", 
-       subtitle = "Date: {___}",
+       subtitle = "Date: {frame_along}",
        x = "",
        y = "",
        color = "vegetable") +
@@ -276,16 +276,18 @@ cum_harvest_subset %>%
 Save it:
 
 ```{r}
-
+anim_save("cum_veg.gif")
 ```
 
 Read it back in:
 
 ```{r}
-
+knitr::include_graphics("cum_veg.gif")
 ```
 
 ## Racing veggies!
+
+Mostly get data prepped (you'll see I didn't do everything I needed to do):
 
 ```{r}
 cum_harvest_all_dates <- garden_harvest %>% 
@@ -299,6 +301,8 @@ cum_harvest_all_dates <- garden_harvest %>%
   mutate(cum_harvest_lb = cumsum(daily_harvest_lb)) %>% 
   filter(cum_harvest_lb > 0)
 ```
+
+Do a little more data prep and create static plot:
 
 ```{r}
 cum_harvest_all_dates %>% 
@@ -327,6 +331,8 @@ cum_harvest_all_dates %>%
         legend.position = "none") +
   scale_fill_viridis_d()
 ```
+
+Let the races begin!
 
 ```{r, eval=FALSE}
 racing_veggies <- cum_harvest_all_dates %>% 

@@ -264,11 +264,11 @@ decorate_chunk("tomato-gganimate2", eval=FALSE) %>%
   flair('theme(legend.position = "none")')
 ```
 
-```{r, eval=FALSE}
+```{r, eval=FALSE, echo=FALSE}
 anim_save("tomatoes2.gif")
 ```
 
-```{r}
+```{r, echo=FALSE}
 knitr::include_graphics("tomatoes2.gif")
 ```
 
@@ -291,11 +291,11 @@ decorate_chunk("tomato-gganimate3", eval=FALSE) %>%
   flair("group = variety")
 ```
 
-```{r, eval=FALSE}
+```{r, eval=FALSE, echo=FALSE}
 anim_save("tomatoes3.gif")
 ```
 
-```{r}
+```{r, echo=FALSE}
 knitr::include_graphics("tomatoes3.gif")
 ```
 
@@ -323,22 +323,26 @@ decorate_chunk("tomato-gganimate4", eval=FALSE) %>%
   flair('subtitle = "Variety: {closest_state}"')
 ```
 
-```{r, eval=FALSE}
+```{r, eval=FALSE, echo=FALSE}
 anim_save("tomatoes4.gif")
 ```
 
-```{r}
+```{r, echo=FALSE}
 knitr::include_graphics("tomatoes4.gif")
 ```
 
 There are many options we can change. Below, we make a couple more changes.
 
-*
+* Save the animated plot as `tomato_gganim` and output the animation using `animate()` in order to control the duration (there are other options in that function, too).
 
-*
+* Change the relative transition lengths (how long it takes to switch `variety`) and state lengths (how long it stays on a variety). These are relative lengths, so the transition time is twice as long as the time spent in a state.  
+
+* Shrink the points as `variety` transitions using `exit_shrink()`.  
+
+* Color the points light blue as they enter and exit. 
 
 ```{r tomato-gganimate5, eval=FALSE, echo=FALSE}
-daily_tomato %>% 
+tomato_gganim <- daily_tomato %>% 
   ggplot(aes(x = daily_harvest, 
              y = day_of_week,
              group = variety)) +
@@ -348,14 +352,159 @@ daily_tomato %>%
        x = "",
        y = "") +
   transition_states(variety, 
-                    transition_length = 3, 
-                    state_length = 4) +
+                    transition_length = 2, 
+                    state_length = 1) +
   exit_shrink() +
-  enter_recolor(color = "lightblue")
+  enter_recolor(color = "lightblue") +
+  exit_recolor(color = "lightblue")
+
+animate(tomato_gganim, duration = 20)
 ```
 
+```{r, echo=FALSE}
+decorate_chunk("tomato-gganimate5", eval=FALSE) %>% 
+  flair("transition_length = 2") %>% 
+  flair("state_length = 1") %>% 
+  flair("exit_shrink()") %>% 
+  flair('enter_recolor(color = "lightblue")') %>% 
+  flair('exit_recolor(color = "lightblue")') %>% 
+  flair("animate(tomato_gganim, duration = 20)") %>% 
+  flair("tomato_gganim <-")
+```
+
+```{r, eval=FALSE, echo=FALSE}
+anim_save("tomatoes5.gif")
+```
+
+```{r, echo=FALSE}
+knitr::include_graphics("tomatoes5.gif")
+```
+
+#### `transition_time()`
+
+This transition is used to transition between distinct states in time. We will show an example of transitioning over harvest dates in the `garden_harvest` dataset.  We will follow the steps outlined earlier for creating an animated plot.
 
 
+First, we create a dataset of daily harvest in pounds for a subset of four vegetables.
+
+```{r}
+daily_harvest_subset <- garden_harvest %>% 
+  filter(vegetable %in% c("tomatoes", "beans", 
+                          "peas", "zucchini")) %>% 
+  group_by(vegetable, date) %>% 
+  summarize(daily_harvest_lb = sum(weight)*0.00220462) 
+
+daily_harvest_subset
+```
+
+Then, we create a static plot, coloring the points differently and assigning different shapes to distinguish the various green colors. 
+
+```{r}
+daily_harvest_subset %>% 
+  ggplot(aes(x = date, 
+             y = daily_harvest_lb,
+             color = vegetable,
+             shape = vegetable)) +
+  geom_point() +
+  labs(title = "Daily harvest (lb)", 
+       x = "",
+       y = "",
+       color = "vegetable",
+       shape = "vegetable") +
+  scale_color_manual(values = c("tomatoes" = "darkred",
+                       "beans" = "springgreen4",
+                       "peas" = "yellowgreen",
+                       "zucchini" = "darkgreen")) +
+  theme(legend.position = "top",
+        legend.title = element_blank()) 
+```
+
+Now we animate the plot, transiting over time by `date`.
+
+```{r veg1, eval=FALSE, echo=FALSE}
+daily_harvest_subset %>% 
+  ggplot(aes(x = date, 
+             y = daily_harvest_lb,
+             color = vegetable,
+             shape = vegetable)) +
+  geom_point() +
+  labs(title = "Daily harvest (lb)", 
+       x = "",
+       y = "",
+       color = "vegetable",
+       shape = "vegetable") +
+  scale_color_manual(values = c("tomatoes" = "darkred",
+                                "beans" = "springgreen4",
+                                "peas" = "yellowgreen",
+                                "zucchini" = "darkgreen")) +
+  theme(legend.position = "top",
+        legend.title = element_blank()) +
+  transition_time(date)
+```
+
+```{r, echo=FALSE}
+decorate_chunk("veg1", eval=FALSE) %>% 
+  flair("transition_time(date)")
+```
+
+```{r, eval=FALSE, echo=FALSE}
+anim_save("veg1.gif")
+```
+
+```{r, echo=FALSE}
+knitr::include_graphics("veg1.gif")
+```
+
+Now, let's try adding some other features:
+
+* Keep a little history of the data via `shadow_wake()`  
+
+* Fade the old data points out via `exit_fade()`
+
+* Add a date subtitle using the `frame_time` variable created from `transition_time()`.
+
+```{r veg2, eval=FALSE, echo=FALSE}
+daily_harvest_subset %>% 
+  ggplot(aes(x = date, 
+             y = daily_harvest_lb,
+             color = vegetable,
+             shape = vegetable)) +
+  geom_point() +
+  labs(title = "Daily harvest (lb)", 
+       subtitle = "Date: {frame_time}",
+       x = "",
+       y = "",
+       color = "vegetable",
+       shape = "vegetable") +
+  scale_color_manual(values = c("tomatoes" = "darkred",
+                                "beans" = "springgreen4",
+                                "peas" = "yellowgreen",
+                                "zucchini" = "darkgreen")) +
+  theme(legend.position = "top",
+        legend.title = element_blank()) +
+  transition_time(date) +
+  shadow_wake(wake_length = .3) +
+  exit_fade()
+```
+
+```{r, echo=FALSE}
+decorate_chunk("veg2", eval=FALSE) %>% 
+  flair("shadow_wake(wake_length = .3)") %>% 
+  flair("exit_fade()") %>% 
+  flair('subtitle = "Date: {frame_time}"')
+```
+
+```{r, eval=FALSE, echo=FALSE}
+anim_save("veg2.gif")
+```
+
+```{r, echo=FALSE}
+knitr::include_graphics("veg2.gif")
+```
+
+#### `transition_reveal()`
+
+This transition allows you to let data gradually appear. We will show an example of building up the data over harvest dates in the `garden_harvest` dataset.  We will follow the steps outlined earlier for creating an animated plot.
 
 ```{r}
 cum_harvest_subset <- garden_harvest %>% 
@@ -390,6 +539,8 @@ cum_harvest_subset %>%
        color = "") +
   transition_reveal(date)
 ```
+
+
 
 ### Demo video
 

@@ -30,6 +30,7 @@ library(ggthemes)      # for more themes (including theme_map())
 library(plotly)        # for the ggplotly() - basic interactivity
 library(gganimate)     # for adding animation layers to ggplots
 library(transformr)    # for "tweening" (gganimate)
+library(gifski)        # for creating the gif (don't need to load this library every time,but need it installed)
 library(shiny)         # for creating interactive apps
 gs4_deauth()           # To not have to authorize each time you knit.
 theme_set(theme_minimal())

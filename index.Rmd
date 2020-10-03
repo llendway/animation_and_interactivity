@@ -730,7 +730,7 @@ download_file(
 
 To begin, you are going to copy everything from my GitHub repo to your own GitHub repo. You do this by *forking*. From your GitHub account, search for mine: llendway/intro_to_shiny. Once there, click the fork button. Then, all my files will be in a repo of the same name on your GitHub page.
 
-GIF00
+![](../gifs/00_fork.mp4){width="90%"}
 
 From there, clone the repo and create a new project in R Studio.
 

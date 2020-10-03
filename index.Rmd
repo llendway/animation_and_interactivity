@@ -734,8 +734,6 @@ To begin, you are going to copy everything from my GitHub repo to your own GitHu
 
 From there, clone the repo and create a new project in R Studio.
 
-GIF01
-
 Once you've done that, you can access all the files from your computer. As you make changes, you can commit and push them out to your own GitHub account, if you'd like.
 
 ### Creating an app
@@ -744,11 +742,11 @@ Creating a Shiny app is different from what we've done so far in this class. One
 
 Let's start by opening the `basic_app_template.R` file in the `app_files` folder. Since you've cloned the repo, this will be one of the files in your project folder. Make sure you have the project open first! Open the file and click Run App. This is a *really* boring app - there is nothing there! But, it is a great starting point because it gives you an outline of what you need in order to make your app work.
 
-GIF02
+![](../gifs/02_basic_app.mp4){width="90%"}
 
 Before getting into a lot of details, let's add a little bit to the app. At the top of the file, load the `tidyverse` and `babynames` libraries and add some text between quotes inside the `fluidPage()` function.Run the app. You can check that you did this right by looking in the `basic_app_add_more.R` file.
 
-GIF03
+![](../gifs/03_basic_add.mp4){width="90%"}
 
 Now, let's move on to creating a more interesting app. The goal is to create a Shiny app for my kids to explore the `babynames` dataset! Remember, that's their favorite.
 
@@ -770,7 +768,7 @@ Setup:
 3. Copy and paste code from the basic_app_add_more.R file  
 4. Save the R Script file as app.R into the folder you just created.  
 
-GIF04
+![](../gifs/04_create_app_file.mp4){width="90%"}
 
 Fun parts:
 

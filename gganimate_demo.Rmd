@@ -335,7 +335,7 @@ cum_harvest_all_dates %>%
 
 Let the races begin!
 
-```{r, eval=FALSE}
+```{r, eval=FALSE, fig.width=3, fig.asp=1}
 racing_veggies <- cum_harvest_all_dates %>% 
   group_by(date) %>% 
   filter(n()>=10) %>% 
@@ -363,7 +363,7 @@ racing_veggies <- cum_harvest_all_dates %>%
   scale_fill_viridis_d() +
   transition_time(date)
 
-animate(racing_veggies, nframes = 200, duration = 30)
+animate(racing_veggies, nframes = 200, duration = 15)
 anim_save("racing_veggies.gif")
 ```
 

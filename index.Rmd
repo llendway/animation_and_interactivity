@@ -702,7 +702,7 @@ This package *might* require some extra setup.
 * If you use Macalester's server, you will almost surely get an error when you try to install `gifski`. The error will say something about not have RUST and will direct you to the [Rust](https://www.rust-lang.org/) website. Click [Getting started](https://www.rust-lang.org/learn/get-started). 
 
   - In the *terminal*, try typing `rustup update`. If that is successful, you are done. If it tells you something about not having Rust, then go to the next step.  
-  - If the previous step was not successful, try running the following in the *terminal*: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh` (this is from the Getting started Rust page and could be slightly out of date - go to that page to assure the code is correct). This may run on its own or it may give you a yes or no option to install. Choose yes by typing yes in the terminal.
+  - If the previous step was not successful, try running the following in the *terminal*: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh` (this is from the Click [Getting started](https://www.rust-lang.org/learn/get-started) Rust page and could be slightly out of date - go to that page to assure the code is correct). This may run on its own or it may give you a yes or no option to install. Choose yes by typing yes in the terminal.
 
 ### Your turn!
 

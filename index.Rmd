@@ -89,7 +89,7 @@ veggie_harvest_graph <- garden_harvest %>%
 veggie_harvest_graph
 ```
 
-Now, we `ploty`-ify it!
+Now, we `plotly`-ify it!
 
 ```{r}
 ggplotly(veggie_harvest_graph)

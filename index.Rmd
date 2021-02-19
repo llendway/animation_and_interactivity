@@ -65,7 +65,6 @@ After this tutorial, you should be able to do the following:
 
 * Publish a shiny app to shinyapps.io.
 
-##  Motivation
 
 ## Easy interactivity with `plotly`
 
@@ -127,7 +126,7 @@ This works for many different types of plots created with `ggplot2`.
 
 ### Resources
 
-[Ploty's ggplot2 integration](https://plotly.com/ggplot2/)
+[Plotly's ggplot2 integration](https://plotly.com/ggplot2/)
 
 ### Your turn!
 

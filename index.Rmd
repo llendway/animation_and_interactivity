@@ -10,7 +10,7 @@ output:
 
 ## Setup
 
-Welcome to another tutorial for this class, COMP/STAT 112: *Introduction to Data Science*! It will be similar to the others, including demo videos and files embedded in this document and practice problems with hints or solutions at the end. There are some new libraries, so be sure to install those first.
+Welcome to another tutorial for this class, COMP/STAT 112: *Introduction to Data Science*! It will be similar to the others, including demo videos and files embedded in this document and practice problems with hints or solutions at the end. There are some new libraries, so be sure to install those first. There are also some additional instructions (especially if you're using the server) down below the demo section.
 
 As most of our files do, we start this one with three R code chunks: 1. options, 2. libraries and settings, 3. data. 
 
@@ -694,12 +694,14 @@ download_file(
 
 This package *might* require some extra setup.
 
-* Make sure you can load the following packages: `gganimate`, `gifski`, `transformr`. First, try just installing `gganimate` and see if you can load all the other packages after only installing that one. If so, you are done. If not, try installing the other packages. Hopefully you have success at that point. If not, talk to me. If you are using Macalester's server, you will likely have to do the next step.
+* Make sure you can load the following packages: `gganimate`, `gifski`, `transformr`. First, try just installing `gganimate` and see if you can load all the other packages after only installing that one. If so, you are done. If not, try installing the other packages. After you install them all, RESTART RStudio. Hopefully you have success at that point. If not, talk to me. If you are using Macalester's server, you will likely have to do the next step.
 
 * If you use Macalester's server, you will almost surely get an error when you try to install `gifski`. The error will say something about not have RUST and will direct you to the [Rust](https://www.rust-lang.org/) website. Click [Getting started](https://www.rust-lang.org/learn/get-started). 
 
   - In the *terminal*, try typing `rustup update`. If that is successful, you are done. If it tells you something about not having Rust, then go to the next step.  
-  - If the previous step was not successful, try running the following in the *terminal*: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh` (this is from the Click [Getting started](https://www.rust-lang.org/learn/get-started) Rust page and could be slightly out of date - go to that page to assure the code is correct). This may run on its own or it may give you a yes or no option to install. Choose yes by typing yes in the terminal.
+  - If the previous step was not successful, try running the following in the *terminal*: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh` (this is from the Click [Getting started](https://www.rust-lang.org/learn/get-started) Rust page and could be slightly out of date - go to that page to assure the code is correct). This may run on its own or it may give you some options. Always type the yes options in the terminal.  
+  - After installing, close the session (go to house icon in top right) and open a new session.  
+  - Now install the gifski library. If that runs successfully, close the R session and open a new one. If that was all successful, you should be able to create animations!
 
 ### Your turn!
 

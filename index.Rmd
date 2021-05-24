@@ -10,6 +10,8 @@ output:
 
 ## Setup
 
+To find other tutorials for this class, go to the main website, [https://ds112-lendway.netlify.app/](https://ds112-lendway.netlify.app/).
+
 Welcome to another tutorial for this class, COMP/STAT 112: *Introduction to Data Science*! It will be similar to the others, including demo videos and files embedded in this document and practice problems with hints or solutions at the end. There are some new libraries, so be sure to install those first. There are also some additional instructions (especially if you're using the server) down below the demo section.
 
 As most of our files do, we start this one with three R code chunks: 1. options, 2. libraries and settings, 3. data. 
